@@ -1,8 +1,8 @@
 ﻿# 🌲 Cypress, do Zero à Nuvem ☁️
 
-👋 Teste bem-vindo(a)!
+👋 Olá, bem-vindo(a)!
 
-É muito bom tê-lo(a) aqui. Tenho certeza que você vai amar esse curso. ❤️
+É muito bom tê-lo(a) aqui. Tenho certeza que você vai amar esse curso e irá aprender muito. ❤️
 
 ## O que você vai aprender?
 
