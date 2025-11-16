@@ -7,26 +7,39 @@ describe('Central de Atendimento ao Cliente TAT', () => {
         cy.title().should('be.equal', 'Central de Atendimento ao Cliente TAT')
     })
 
+
     it('preenche os campos obrigatórios e envia o formulário', () => {
-        const longText = Cypress._.repeat('abcdefghijklmnopqrstuvwxzy ', 10)
+        Cypress._.times(2, () => { // cypress ._. chama a biblioteca lodash do javascript , times é a função que repete o teste, primeiro passo a quantidade depois o que vou realizar
+            const longText = Cypress._.repeat('abcdefghijklmnopqrstuvwxzy ', 10)
 
-        cy.get('#firstName').type('Italo')
-        cy.get('#lastName').type('Thiago')
-        cy.get('#email').type('italo.thiago@teste.com')
-        cy.get('#open-text-area').type(longText, { delay: 0 })
-        cy.contains('button', 'Enviar').click()
+            cy.clock() //congela o tempo
+            cy.get('#firstName').type('Italo')
+            cy.get('#lastName').type('Thiago')
+            cy.get('#email').type('italo.thiago@teste.com')
+            cy.get('#open-text-area').type(longText, { delay: 0 })
+            cy.contains('button', 'Enviar').click()
+            cy.get('.success').should('be.visible')
 
-        cy.get('.success').should('be.visible')
+            cy.tick(3000) // avança no tempo 3 segundos
+
+            cy.get('.success').should('not.be.visible')
+        })
     })
 
-    it.only('exibe mensagem de erro ao submeter o formulário com um email com formatação inválida', () => {
-        cy.get('#firstName').type('Italo')
-        cy.get('#lastName').type('Thiago')
-        cy.get('#email').type('italo.thiago@teste,com')
-        cy.get('#open-text-area').type('teste')
-        cy.contains('button', 'Enviar').click()
+    it('exibe mensagem de erro ao submeter o formulário com um email com formatação inválida', () => {
+        Cypress._.times(2, () => { // chamando a blibioteca lodash (Cypress ._.) e repeetindo o teste 2 vezes com a função times
+            cy.clock() // congela o tempo
+            cy.get('#firstName').type('Italo')
+            cy.get('#lastName').type('Thiago')
+            cy.get('#email').type('italo.thiago@teste,com')
+            cy.get('#open-text-area').type('teste')
+            cy.contains('button', 'Enviar').click()
 
-        cy.get('.error').should('be.visible')
+            cy.get('.error').should('be.visible')
+
+            cy.tick(3000)// avança n tempo 3 segundos
+            cy.get('.error').should('not.be.visible')
+        })
     })
 
     it('campo telefone continua vazio quando preenchido com valor não numérico', () => {
@@ -36,6 +49,7 @@ describe('Central de Atendimento ao Cliente TAT', () => {
     })
 
     it('exibe mensagem de erro quando o telefone se torna obrigatório mas não é preenchido antes do envio do formulário', () => {
+        cy.clock()
         cy.get('#firstName').type('Italo')
         cy.get('#lastName').type('Thiago')
         cy.get('#email').type('italo.thiago@teste.com')
@@ -44,6 +58,9 @@ describe('Central de Atendimento ao Cliente TAT', () => {
         cy.contains('button', 'Enviar').click()
 
         cy.get('.error').should('be.visible')
+
+        cy.tick(3000)
+        cy.get('.error').should('not.be.visible')
     })
 
     it('preenche e limpa os campos nome, sobrenome, email e telefone', () => {
@@ -70,12 +87,18 @@ describe('Central de Atendimento ao Cliente TAT', () => {
     })
 
     it('exibe mensagem de erro ao submeter o formulário sem preencher os campos obrigatórios', () => {
+        cy.clock()
         cy.contains('button', 'Enviar').click()
 
         cy.get('.error').should('be.visible')
+
+        cy.tick(3000)
+        cy.get('.error').should('not.be.visible')
     })
 
     it('envia o formulário com sucesso usando um comando customizado', () => {
+
+        cy.clock()
         const data = {
             firstName: 'Italo',
             lastName: 'Thiago',
@@ -88,6 +111,8 @@ describe('Central de Atendimento ao Cliente TAT', () => {
 
         cy.get('.success').should('be.visible')
 
+        cy.tick(3000)
+        cy.get('.success').should('not.be.visible')
     })
 
     it('seleciona um produto (YouTube) por seu texto', () => {
@@ -179,6 +204,55 @@ describe('Central de Atendimento ao Cliente TAT', () => {
             .click()    
         cy.get('#white-background').should('be.visible')
     })
+
+    it('exibe e oculta as mensagens de sucesso e erro usando .invoke()', () => {
+        cy.get('.success')
+            .should('not.be.visible')
+            .invoke('show') // força a exibição de um elemento oculto
+            .should('be.visible')
+            .and('contain', 'Mensagem enviada com sucesso.')
+            .invoke('hide') // oculta um elemento que esta visivel
+            .should('not.be.visible')
+       
+    })
+
+    it('preenche o campo da área de texto usando o comando invoke', () => {
+        cy.get('#open-text-area')
+            .invoke('val', 'um texto qualquer')
+            .should('have.value', 'um texto qualquer')
+
+    })
+
+    it('faz uma requisição HTTP', () => {
+        cy.request('https://cac-tat-v3.s3.eu-central-1.amazonaws.com/index.html')  //fazendo uma requisição
+            .as('TesteRequisicao')  //Dando um nome para a requisição
+            .its('status')  //pega o valor da propriedade de um objeto
+            .should('be.equal', 200)
+        cy.get('@TesteRequisicao')  //Como dei um alias a minha requisição, não preciso passar a URL novamente
+            .its('statusText')  // Chamando a propiedade di statusText
+            .should('be.equal', 'OK') //Verificando se ela retorna 'ok'
+        cy.get('@TesteRequisicao')
+            .its('body')
+            .should('include', 'CAC TAT')  //Verificando se no body contém o texto 'CAC TAT'
+    })
+
+    it.only('Encontrando o gato', () => {
+        cy.get('#cat')
+            .should('not.be.visible')
+            .invoke('show')  // força a exibição de um elemento oculto
+            .should('be.visible')
+            .invoke('hide')  // oculta um elemento que esta visivel
+            .should('not.be.visible')
+        cy.get('#title')
+            .invoke('text', 'CAT TAT')
+        cy.get('#subtitle')
+            .invoke('text', 'Italo Thiago P L')
+            
+
+
+
+    })
+
 })
 
 

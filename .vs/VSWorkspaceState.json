@@ -2,8 +2,9 @@
   "ExpandedNodes": [
     "",
     "\\.github",
-    "\\.github\\workflows"
+    "\\.github\\workflows",
+    "\\lessons"
   ],
-  "SelectedNode": "\\.gitignore",
+  "SelectedNode": "\\lessons\\README.md",
   "PreviewInSolutionExplorer": false
 }
